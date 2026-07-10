@@ -63,8 +63,9 @@ async function loadFeaturedWork() {
       const bg = item.image_url
         ? `background-image:url('${escapeAttr(item.image_url)}'); background-size:cover; background-position:center;`
         : `background:linear-gradient(135deg, ${escapeAttr(item.gradient_start || '#0e2b4a')}, ${escapeAttr(item.gradient_end || '#1f6fa8')});`;
+      const href = item.slug ? `work-detail.html?slug=${encodeURIComponent(item.slug)}` : (item.link_url || '#contact');
       return `
-        <a class="work-card" href="${escapeAttr(item.link_url || '#contact')}">
+        <a class="work-card" href="${escapeAttr(href)}">
           <div class="thumb" style="${bg}"><div><h3>${escapeHtml(item.title)}</h3><div class="tag">${escapeHtml(item.tag || '')}</div></div></div>
           <div class="body"><p>${escapeHtml(item.description || '')}</p><div class="result">${escapeHtml(item.result || '')}</div></div>
         </a>`;
@@ -86,13 +87,16 @@ async function loadBlogPosts() {
 
     if (error || !data || data.length === 0) return; // keep hardcoded fallback
 
-    grid.innerHTML = data.map(post => `
-      <a class="res-card" href="${escapeAttr(post.link_url || '#')}" style="text-decoration:none;">
+    grid.innerHTML = data.map(post => {
+      const href = post.slug ? `blog-post.html?slug=${encodeURIComponent(post.slug)}` : (post.link_url || '#');
+      return `
+      <a class="res-card" href="${escapeAttr(href)}" style="text-decoration:none;">
         <div class="kicker">${escapeHtml(post.kicker || '')}</div>
         <h3>${escapeHtml(post.title)}</h3>
         <p>${escapeHtml(post.excerpt || '')}</p>
         <div class="meta">${escapeHtml(post.read_time || '')}</div>
-      </a>`).join('');
+      </a>`;
+    }).join('');
   } catch (err) {
     console.error('Could not load blog posts from Supabase:', err);
   }
