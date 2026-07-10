@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Site Admin — Ibrahim Babalola</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,500;0,600;1,500&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#EFF9FD; --panel:#D9EDE4; --paper:#ffffff; --ink:#152229; --ink-soft:#5c6f77;
+    --line:#cfe3ea; --accent:#c6ff5e; --accent-ink:#1c2b03; --violet:#8b7cf6; --danger:#d9534f;
+    --display:'Fraunces',serif; --body:'Inter',sans-serif; --mono:'JetBrains Mono',monospace;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0; font-family:var(--body); background:var(--bg); color:var(--ink); line-height:1.5;}
+  h1,h2,h3{font-family:var(--display); font-weight:600; margin:0 0 4px;}
+  a{color:var(--violet);}
+  .wrap{max-width:960px; margin:0 auto; padding:32px 24px 80px;}
+  header.top{display:flex; justify-content:space-between; align-items:center; padding:18px 24px; background:var(--paper); border-bottom:1px solid var(--line); position:sticky; top:0; z-index:10;}
+  header.top h1{font-size:18px;}
+  .card{background:var(--paper); border:1px solid var(--line); border-radius:10px; padding:26px; margin-bottom:28px;}
+  .card h2{font-size:20px; margin-bottom:6px;}
+  .card .hint{color:var(--ink-soft); font-size:13px; margin-bottom:18px;}
+  label{display:block; font-size:12.5px; font-weight:600; text-transform:uppercase; letter-spacing:.04em; color:var(--ink-soft); margin:14px 0 6px;}
+  input[type=text], input[type=email], input[type=password], input[type=url], input[type=number], textarea{
+    width:100%; padding:10px 12px; border:1px solid var(--line); border-radius:6px; font-family:inherit; font-size:14px; background:var(--paper); color:var(--ink);
+  }
+  textarea{min-height:70px; resize:vertical;}
+  input[type=checkbox]{width:auto; margin-right:8px;}
+  .row{display:flex; gap:16px; flex-wrap:wrap;}
+  .row > div{flex:1; min-width:200px;}
+  button{font-family:inherit; cursor:pointer; border:none; border-radius:100px; font-weight:600; font-size:14px; padding:10px 20px; transition:transform .12s;}
+  button:hover{transform:translateY(-1px);}
+  .btn-primary{background:var(--accent); color:var(--accent-ink);}
+  .btn-outline{background:transparent; border:1px solid var(--ink); color:var(--ink); border-radius:100px;}
+  .btn-danger{background:transparent; color:var(--danger); border:1px solid var(--danger); border-radius:100px; padding:6px 14px; font-size:13px;}
+  .btn-small{padding:6px 14px; font-size:13px; border-radius:100px;}
+  .actions{margin-top:16px; display:flex; gap:10px; align-items:center;}
+  .status{font-size:13px; color:var(--ink-soft); margin-left:4px;}
+  .status.ok{color:#2b7a3d;}
+  .status.err{color:var(--danger);}
+  .item-list{display:flex; flex-direction:column; gap:10px; margin-top:10px;}
+  .item{border:1px solid var(--line); border-radius:8px; padding:14px 16px; display:flex; justify-content:space-between; align-items:center; gap:12px; background:var(--bg);}
+  .item .meta{font-size:12.5px; color:var(--ink-soft); font-family:var(--mono);}
+  .item .title{font-weight:600;}
+  .item .item-actions{display:flex; gap:8px; flex:none;}
+  .logo-preview{height:44px; margin-top:10px; display:block;}
+  #loginScreen{max-width:380px; margin:120px auto 0;}
+  #loginScreen .card{margin:0;}
+  #appScreen{display:none;}
+  .divider{border:none; border-top:1px solid var(--line); margin:22px 0;}
+</style>
+</head>
+<body>
+
+<div id="loginScreen" class="wrap">
+  <div class="card">
+    <h2>Admin sign in</h2>
+    <p class="hint">Sign in with the admin account you created in Supabase Auth.</p>
+    <label for="loginEmail">Email</label>
+    <input type="email" id="loginEmail" autocomplete="username">
+    <label for="loginPassword">Password</label>
+    <input type="password" id="loginPassword" autocomplete="current-password">
+    <div class="actions">
+      <button class="btn-primary" id="loginBtn">Sign in</button>
+      <span class="status" id="loginStatus"></span>
+    </div>
+  </div>
+</div>
+
+<div id="appScreen">
+  <header class="top">
+    <h1>Site content admin</h1>
+    <div>
+      <span class="status" id="userEmail" style="margin-right:14px;"></span>
+      <button class="btn-outline btn-small" id="logoutBtn">Sign out</button>
+    </div>
+  </header>
+
+  <div class="wrap">
+
+    <!-- SITE SETTINGS -->
+    <div class="card">
+      <h2>Logo, favicon &amp; book-a-call link</h2>
+      <p class="hint">Changes here apply across the whole site immediately.</p>
+
+      <label for="logoFile">Logo image</label>
+      <input type="file" id="logoFile" accept="image/*">
+      <img id="logoPreview" class="logo-preview" alt="">
+
+      <label for="faviconFile">Favicon (square image, e.g. 64×64)</label>
+      <input type="file" id="faviconFile" accept="image/*">
+      <img id="faviconPreview" class="logo-preview" style="height:28px;" alt="">
+
+      <label for="bookCallUrl">Book-a-call link (e.g. your Cal.com URL)</label>
+      <input type="url" id="bookCallUrl" placeholder="https://cal.com/your-name/discovery-call">
+
+      <div class="actions">
+        <button class="btn-primary" id="saveSettingsBtn">Save changes</button>
+        <span class="status" id="settingsStatus"></span>
+      </div>
+    </div>
+
+    <!-- FEATURED WORK -->
+    <div class="card">
+      <h2>Featured work</h2>
+      <p class="hint">Shown in the "Featured work" grid, ordered by sort order (lowest first).</p>
+      <div class="item-list" id="workList"></div>
+      <hr class="divider">
+      <h3 style="font-size:15px;">Add new project</h3>
+      <div class="row">
+        <div><label>Title</label><input type="text" id="workTitle"></div>
+        <div><label>Tag</label><input type="text" id="workTag" placeholder="Fintech · Webflow rebuild"></div>
+      </div>
+      <label>Description</label><textarea id="workDescription"></textarea>
+      <label>Result line</label><input type="text" id="workResult" placeholder="Launched in 11 days, 3 rounds of revisions">
+      <div class="row">
+        <div><label>Link URL</label><input type="url" id="workLink" placeholder="#contact"></div>
+        <div><label>Sort order</label><input type="number" id="workSort" value="0"></div>
+      </div>
+      <label for="workImageFile">Thumbnail image (optional — otherwise a gradient is used)</label>
+      <input type="file" id="workImageFile" accept="image/*">
+      <div class="row">
+        <div><label>Gradient start</label><input type="text" id="workGradStart" value="#0e2b4a"></div>
+        <div><label>Gradient end</label><input type="text" id="workGradEnd" value="#1f6fa8"></div>
+      </div>
+      <div class="actions">
+        <button class="btn-primary" id="addWorkBtn">Add project</button>
+        <span class="status" id="workStatus"></span>
+      </div>
+    </div>
+
+    <!-- BLOG POSTS -->
+    <div class="card">
+      <h2>Blog posts</h2>
+      <p class="hint">Shown in the "Resources" grid. Uncheck "Published" to hide a post without deleting it.</p>
+      <div class="item-list" id="blogList"></div>
+      <hr class="divider">
+      <h3 style="font-size:15px;">Add new post</h3>
+      <div class="row">
+        <div><label>Kicker / category</label><input type="text" id="blogKicker" placeholder="Process"></div>
+        <div><label>Read time</label><input type="text" id="blogReadTime" placeholder="6 min read"></div>
+      </div>
+      <label>Title</label><input type="text" id="blogTitle">
+      <label>Excerpt</label><textarea id="blogExcerpt"></textarea>
+      <div class="row">
+        <div><label>Link URL</label><input type="url" id="blogLink" placeholder="https://..."></div>
+        <div><label>Sort order</label><input type="number" id="blogSort" value="0"></div>
+      </div>
+      <label><input type="checkbox" id="blogPublished" checked> Published</label>
+      <div class="actions">
+        <button class="btn-primary" id="addBlogBtn">Add post</button>
+        <span class="status" id="blogStatus"></span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="config.js"></script>
+<script src="admin.js"></script>
+</body>
+</html>
