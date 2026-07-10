@@ -8,82 +8,14 @@
 <link id="favicon" rel="icon" type="image/png" href="https://placehold.co/64x64/EFF9FD/152229?text=IB">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,500;0,600;1,500&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="theme.css">
 <style>
-  :root{
-    --bg:#EFF9FD;
-    --bg2:#D9EDE4;
-    --paper:#ffffff;
-    --panel:#D9EDE4;
-    --ink:#152229;
-    --ink-soft:#5c6f77;
-    --line-dark:#c7dfe6;
-    --line-light:#cfe3ea;
-    --accent:#c6ff5e;
-    --accent-ink:#1c2b03;
-    --violet:#8b7cf6;
-    --white:#ffffff;
-    --display:'Fraunces',serif;
-    --body:'Inter',sans-serif;
-    --mono:'JetBrains Mono',monospace;
-    --maxw:1220px;
-  }
-  *{box-sizing:border-box;}
+  /* Shared colors, fonts, base reset, header, footer, and buttons now live in theme.css */
   html{scroll-behavior:smooth;}
   @media (prefers-reduced-motion: reduce){
     html{scroll-behavior:auto;}
     *{animation-duration:0.01ms !important; animation-iteration-count:1 !important; transition-duration:0.01ms !important;}
   }
-  body{margin:0; font-family:var(--body); color:var(--ink); background:var(--paper); line-height:1.55; -webkit-font-smoothing:antialiased;}
-  h1,h2,h3,h4{font-family:var(--display); margin:0; line-height:1.08; letter-spacing:-0.01em; font-weight:500;}
-  p{margin:0;}
-  a{color:inherit; text-decoration:none;}
-  ul{margin:0; padding:0; list-style:none;}
-  img{max-width:100%; display:block;}
-  button{font-family:inherit; cursor:pointer;}
-  .wrap{max-width:var(--maxw); margin:0 auto; padding:0 24px;}
-  .mono{font-family:var(--mono);}
-  :focus-visible{outline:2px solid var(--violet); outline-offset:2px;}
-  .eyebrow{font-family:var(--mono); font-size:12px; letter-spacing:0.1em; text-transform:uppercase; color:var(--ink-soft); display:flex; align-items:center; gap:8px; margin-bottom:16px;}
-  .eyebrow::before{content:""; width:16px; height:1px; background:var(--violet); display:inline-block;}
-  .skip-link{position:absolute; left:-999px; background:#fff; padding:10px 16px; z-index:200;}
-  .skip-link:focus{left:16px; top:16px;}
-
-  /* ---------- Header ---------- */
-  header.site{position:sticky; top:0; z-index:50; background:rgba(255,255,255,0.85); backdrop-filter:blur(8px); border-bottom:1px solid var(--line-light);}
-  .nav-row{display:flex; align-items:center; justify-content:space-between; height:78px; gap:20px;}
-  .logo{display:flex; align-items:center; gap:10px; line-height:1.1;}
-  .logo .logo-img{height:34px; width:auto; display:none;}
-  .logo .logo-text{display:flex; flex-direction:column; line-height:1.1;}
-  .logo .name{font-family:var(--display); font-size:19px; font-weight:600; color:var(--ink);}
-  .logo .sub{font-family:var(--mono); font-size:10px; letter-spacing:0.08em; text-transform:uppercase; color:var(--ink-soft); margin-top:2px;}
-  nav.primary{display:flex; align-items:center; gap:30px;}
-  nav.primary ul{display:flex; gap:26px;}
-  nav.primary a{font-size:14.5px; font-weight:500; color:var(--ink); padding:8px 0; border-bottom:2px solid transparent; transition:border-color .15s;}
-  nav.primary a:hover{border-color:var(--accent);}
-  .header-cta{display:flex; align-items:center; gap:14px;}
-  .btn{display:inline-flex; align-items:center; gap:8px; font-weight:600; font-size:14px; padding:12px 22px; border-radius:100px; border:1px solid transparent; white-space:nowrap; transition:transform .15s, box-shadow .15s, background .15s, color .15s;}
-  .btn-accent{background:var(--accent); color:var(--accent-ink);}
-  .btn-accent:hover{transform:translateY(-1px); box-shadow:0 8px 20px rgba(198,255,94,0.45);}
-  .btn-outline{border-color:var(--ink); color:var(--ink); background:transparent;}
-  .btn-outline:hover{background:var(--ink); color:var(--paper);}
-  .btn-outline-light{border-color:rgba(21,34,41,0.3); color:var(--ink); background:transparent;}
-  .btn-outline-light:hover{background:rgba(21,34,41,0.08);}
-  .hamburger{display:none; flex-direction:column; gap:5px; background:none; border:none; padding:6px;}
-  .hamburger span{width:22px; height:2px; background:var(--ink); display:block;}
-  @media (max-width:960px){
-    nav.primary{display:none;}
-    .header-cta .btn-outline{display:none;}
-    .hamburger{display:flex;}
-  }
-
-  /* ---------- Mobile menu ---------- */
-  .mobile-menu{position:fixed; inset:0; background:var(--paper); z-index:100; color:var(--ink); display:flex; flex-direction:column; padding:24px; transform:translateX(100%); transition:transform .25s ease; overflow-y:auto;}
-  .mobile-menu.open{transform:translateX(0);}
-  .mobile-menu .close-row{display:flex; justify-content:flex-end;}
-  .mobile-menu .close-row button{background:none; border:none; color:var(--ink); font-size:28px; line-height:1;}
-  .mobile-menu ul{display:flex; flex-direction:column; margin-top:16px;}
-  .mobile-menu li a{display:block; padding:16px 4px; border-bottom:1px solid var(--line-light); color:var(--ink); font-family:var(--display); font-size:21px;}
-  .mobile-menu .btn{margin-top:24px; justify-content:center;}
 
   /* ---------- Hero ---------- */
   .hero{padding:70px 0 100px; position:relative; overflow:hidden;}
@@ -216,20 +148,7 @@
   .final-cta .cta-row{display:flex; gap:14px; justify-content:center; margin-top:32px; flex-wrap:wrap;}
   .final-cta .response{margin-top:26px; font-family:var(--mono); font-size:12.5px; color:var(--ink-soft);}
 
-  /* ---------- Footer ---------- */
-  footer{background:var(--bg2); color:var(--ink-soft); padding:50px 0 26px; border-top:1px solid var(--line-light);}
-  .footer-row{display:flex; justify-content:space-between; align-items:flex-start; gap:24px; flex-wrap:wrap; padding-bottom:30px;}
-  footer .logo .name{color:var(--ink);}
-  footer .foot-nav{display:flex; gap:26px; flex-wrap:wrap;}
-  footer .foot-nav a{font-size:13.5px; color:var(--ink-soft);}
-  footer .foot-nav a:hover{color:var(--violet);}
-  .social-row{display:flex; gap:16px;}
-  .social-row a{font-family:var(--mono); font-size:12.5px; color:var(--ink-soft);}
-  .social-row a:hover{color:var(--violet);}
-  .footer-bottom{display:flex; justify-content:space-between; padding-top:22px; border-top:1px solid var(--line-light); font-size:12.5px; color:var(--ink-soft); flex-wrap:wrap; gap:10px;}
-
-  .reveal{opacity:0; transform:translateY(18px); transition:opacity .6s ease, transform .6s ease;}
-  .reveal.in{opacity:1; transform:translateY(0);}
+  /* Footer styles and .reveal utility now live in theme.css */
 </style>
 </head>
 <body>
