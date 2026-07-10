@@ -5,22 +5,35 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Site Admin — Ibrahim Babalola</title>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,500;0,600;1,500&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="theme.css">
 <style>
-  /* Colors and fonts come from theme.css — everything below is admin-only layout */
+  :root{
+    --bg:#EFF9FD; --panel:#D9EDE4; --paper:#ffffff; --ink:#152229; --ink-soft:#5c6f77;
+    --line:#cfe3ea; --accent:#c6ff5e; --accent-ink:#1c2b03; --violet:#8b7cf6; --danger:#d9534f;
+    --display:'Fraunces',serif; --body:'Inter',sans-serif; --mono:'JetBrains Mono',monospace;
+  }
   *{box-sizing:border-box;}
   body{margin:0; font-family:var(--body); background:var(--bg); color:var(--ink); line-height:1.5;}
   h1,h2,h3{font-family:var(--display); font-weight:600; margin:0 0 4px;}
   a{color:var(--violet);}
   .wrap{max-width:960px; margin:0 auto; padding:32px 24px 80px;}
-  header.top{display:flex; justify-content:space-between; align-items:center; padding:18px 24px; background:var(--paper); border-bottom:1px solid var(--line-light); position:sticky; top:0; z-index:10;}
+  header.top{display:flex; justify-content:space-between; align-items:center; padding:18px 24px; background:var(--paper); border-bottom:1px solid var(--line); position:sticky; top:0; z-index:10;}
   header.top h1{font-size:18px;}
-  .card{background:var(--paper); border:1px solid var(--line-light); border-radius:10px; padding:26px; margin-bottom:28px;}
+  
+  /* Navigation Tabs Menu */
+  .admin-nav{display:flex; gap:8px; background:var(--paper); padding:0 24px; border-bottom:1px solid var(--line);}
+  .nav-btn{background:transparent; border:none; border-bottom:3px solid transparent; padding:14px 16px; font-weight:600; font-size:14px; color:var(--ink-soft); border-radius:0; cursor:pointer; transition:all .15s;}
+  .nav-btn:hover{color:var(--ink); transform:none;}
+  .nav-btn.active{color:var(--violet); border-bottom-color:var(--violet);}
+  
+  .screen-pane{display:none;}
+  .screen-pane.active{display:block;}
+
+  .card{background:var(--paper); border:1px solid var(--line); border-radius:10px; padding:26px; margin-bottom:28px;}
   .card h2{font-size:20px; margin-bottom:6px;}
   .card .hint{color:var(--ink-soft); font-size:13px; margin-bottom:18px;}
   label{display:block; font-size:12.5px; font-weight:600; text-transform:uppercase; letter-spacing:.04em; color:var(--ink-soft); margin:14px 0 6px;}
   input[type=text], input[type=email], input[type=password], input[type=url], input[type=number], textarea{
-    width:100%; padding:10px 12px; border:1px solid var(--line-light); border-radius:6px; font-family:inherit; font-size:14px; background:var(--paper); color:var(--ink);
+    width:100%; padding:10px 12px; border:1px solid var(--line); border-radius:6px; font-family:inherit; font-size:14px; background:var(--paper); color:var(--ink);
   }
   textarea{min-height:70px; resize:vertical;}
   input[type=checkbox]{width:auto; margin-right:8px;}
@@ -36,8 +49,19 @@
   .status{font-size:13px; color:var(--ink-soft); margin-left:4px;}
   .status.ok{color:#2b7a3d;}
   .status.err{color:var(--danger);}
+  
+  /* Rich Text Editor Styling */
+  .rte-container{border:1px solid var(--line); border-radius:6px; overflow:hidden; margin-bottom:14px; background:var(--paper);}
+  .rte-toolbar{background:var(--bg); padding:6px; border-bottom:1px solid var(--line); display:flex; gap:4px; flex-wrap:wrap;}
+  .rte-tool{background:var(--paper); border:1px solid var(--line); border-radius:4px; padding:4px 8px; font-size:12px; font-weight:600; color:var(--ink); cursor:pointer;}
+  .rte-tool:hover{background:var(--line);}
+  .rte-editor{min-height:160px; padding:12px; overflow-y:auto; color:var(--ink); font-size:14px;}
+  .rte-editor:focus{outline:none;}
+  .rte-editor img {max-width:100%; max-height:250px; display:block; margin:8px 0; border-radius:4px;}
+  .rte-editor iframe {width:100%; max-width:500px; height:281px; display:block; margin:8px 0;}
+
   .item-list{display:flex; flex-direction:column; gap:10px; margin-top:10px;}
-  .item{border:1px solid var(--line-light); border-radius:8px; padding:14px 16px; display:flex; justify-content:space-between; align-items:center; gap:12px; background:var(--bg);}
+  .item{border:1px solid var(--line); border-radius:8px; padding:14px 16px; display:flex; justify-content:space-between; align-items:center; gap:12px; background:var(--bg);}
   .item .meta{font-size:12.5px; color:var(--ink-soft); font-family:var(--mono);}
   .item .title{font-weight:600;}
   .item .item-actions{display:flex; gap:8px; flex:none;}
@@ -45,7 +69,7 @@
   #loginScreen{max-width:380px; margin:120px auto 0;}
   #loginScreen .card{margin:0;}
   #appScreen{display:none;}
-  .divider{border:none; border-top:1px solid var(--line-light); margin:22px 0;}
+  .divider{border:none; border-top:1px solid var(--line); margin:22px 0;}
 </style>
 </head>
 <body>
@@ -74,90 +98,128 @@
     </div>
   </header>
 
+  <!-- Navigation Menu Tab Bar -->
+  <nav class="admin-nav">
+    <button class="nav-btn active" data-target="settingsScreen">Site Settings</button>
+    <button class="nav-btn" data-target="workScreen">Featured Work</button>
+    <button class="nav-btn" data-target="blogScreen">Blog Posts</button>
+  </nav>
+
   <div class="wrap">
+    
+    <!-- 1. SITE SETTINGS SCREEN -->
+    <div id="settingsScreen" class="screen-pane active">
+      <div class="card">
+        <h2>Logo, favicon &amp; book-a-call link</h2>
+        <p class="hint">Changes here apply across the whole site immediately.</p>
 
-    <!-- SITE SETTINGS -->
-    <div class="card">
-      <h2>Logo, favicon &amp; book-a-call link</h2>
-      <p class="hint">Changes here apply across the whole site immediately.</p>
+        <label for="logoFile">Logo image</label>
+        <input type="file" id="logoFile" accept="image/*">
+        <img id="logoPreview" class="logo-preview" alt="">
 
-      <label for="logoFile">Logo image</label>
-      <input type="file" id="logoFile" accept="image/*">
-      <img id="logoPreview" class="logo-preview" alt="">
+        <label for="faviconFile">Favicon (square image, e.g. 64×64)</label>
+        <input type="file" id="faviconFile" accept="image/*">
+        <img id="faviconPreview" class="logo-preview" style="height:28px;" alt="">
 
-      <label for="faviconFile">Favicon (square image, e.g. 64×64)</label>
-      <input type="file" id="faviconFile" accept="image/*">
-      <img id="faviconPreview" class="logo-preview" style="height:28px;" alt="">
+        <label for="bookCallUrl">Book-a-call link (e.g. your Cal.com URL)</label>
+        <input type="url" id="bookCallUrl" placeholder="https://cal.com/your-name/discovery-call">
 
-      <label for="bookCallUrl">Book-a-call link (e.g. your Cal.com URL)</label>
-      <input type="url" id="bookCallUrl" placeholder="https://cal.com/your-name/discovery-call">
-
-      <div class="actions">
-        <button class="btn-primary" id="saveSettingsBtn">Save changes</button>
-        <span class="status" id="settingsStatus"></span>
+        <div class="actions">
+          <button class="btn-primary" id="saveSettingsBtn">Save changes</button>
+          <span class="status" id="settingsStatus"></span>
+        </div>
       </div>
     </div>
 
-    <!-- FEATURED WORK -->
-    <div class="card">
-      <h2>Featured work</h2>
-      <p class="hint">Shown in the "Featured work" grid, ordered by sort order (lowest first).</p>
-      <div class="item-list" id="workList"></div>
-      <hr class="divider">
-      <h3 style="font-size:15px;">Add new project</h3>
-      <div class="row">
-        <div><label>Title</label><input type="text" id="workTitle"></div>
-        <div><label>Tag</label><input type="text" id="workTag" placeholder="Fintech · Webflow rebuild"></div>
-      </div>
-      <label>URL slug (used for the case study page — leave blank to auto-generate from title)</label>
-      <input type="text" id="workSlug" placeholder="chaser-webflow-rebuild">
-      <label>Description (short summary shown on the card)</label>
-      <textarea id="workDescription"></textarea>
-      <label>Full case study content (optional, shown on the project's own page — supports markdown)</label>
-      <textarea id="workBody" style="min-height:140px;" placeholder="## The challenge&#10;&#10;Write the full case study here in markdown..."></textarea>
-      <label>Result line</label><input type="text" id="workResult" placeholder="Launched in 11 days, 3 rounds of revisions">
-      <div class="row">
-        <div><label>External link (optional — e.g. the live client site)</label><input type="url" id="workLink" placeholder="https://client-site.com"></div>
-        <div><label>Sort order</label><input type="number" id="workSort" value="0"></div>
-      </div>
-      <label for="workImageFile">Thumbnail image (optional — otherwise a gradient is used)</label>
-      <input type="file" id="workImageFile" accept="image/*">
-      <div class="row">
-        <div><label>Gradient start</label><input type="text" id="workGradStart" value="#0e2b4a"></div>
-        <div><label>Gradient end</label><input type="text" id="workGradEnd" value="#1f6fa8"></div>
-      </div>
-      <div class="actions">
-        <button class="btn-primary" id="addWorkBtn">Add project</button>
-        <span class="status" id="workStatus"></span>
+    <!-- 2. FEATURED WORK SCREEN -->
+    <div id="workScreen" class="screen-pane">
+      <div class="card">
+        <h2>Featured work</h2>
+        <p class="hint">Shown in the "Featured work" grid, ordered by sort order (lowest first).</p>
+        <div class="item-list" id="workList"></div>
+        <hr class="divider">
+        
+        <h3 id="workFormTitle" style="font-size:15px;">Add new project</h3>
+        <input type="hidden" id="workId" value="">
+        <div class="row">
+          <div><label>Title</label><input type="text" id="workTitle"></div>
+          <div><label>Tag</label><input type="text" id="workTag" placeholder="Fintech · Webflow rebuild"></div>
+        </div>
+        
+        <label>Description (Rich Text)</label>
+        <div class="rte-container">
+          <div class="rte-toolbar" data-editor="workDescription">
+            <button type="button" class="rte-tool" data-cmd="bold"><b>B</b></button>
+            <button type="button" class="rte-tool" data-cmd="italic"><i>I</i></button>
+            <button type="button" class="rte-tool" data-cmd="createLink">Link</button>
+            <button type="button" class="rte-tool" data-cmd="insertImage">Img URL</button>
+            <button type="button" class="rte-tool" data-cmd="insertVideo">Video Embed</button>
+            <button type="button" class="rte-tool" data-cmd="insertHTML">Raw HTML</button>
+          </div>
+          <div id="workDescription" class="rte-editor" contenteditable="true"></div>
+        </div>
+
+        <label>Result line</label><input type="text" id="workResult" placeholder="Launched in 11 days, 3 rounds of revisions">
+        <div class="row">
+          <div><label>Link URL</label><input type="url" id="workLink" placeholder="#contact"></div>
+          <div><label>Sort order</label><input type="number" id="workSort" value="0"></div>
+        </div>
+        <label for="workImageFile">Thumbnail image (optional — otherwise a gradient is used)</label>
+        <input type="file" id="workImageFile" accept="image/*">
+        <div id="workImageCurrentContainer" style="display:none; margin: 6px 0;">
+          <span style="font-size:12px; color:var(--ink-soft);">Current Image: </span><a id="workImageCurrentUrl" href="#" target="_blank" style="font-size:12px;">View</a>
+        </div>
+        <div class="row">
+          <div><label>Gradient start</label><input type="text" id="workGradStart" value="#0e2b4a"></div>
+          <div><label>Gradient end</label><input type="text" id="workGradEnd" value="#1f6fa8"></div>
+        </div>
+        <div class="actions">
+          <button class="btn-primary" id="addWorkBtn">Add project</button>
+          <button class="btn-outline" id="cancelWorkEditBtn" style="display:none;">Cancel Edit</button>
+          <span class="status" id="workStatus"></span>
+        </div>
       </div>
     </div>
 
-    <!-- BLOG POSTS -->
-    <div class="card">
-      <h2>Blog posts</h2>
-      <p class="hint">Shown in the "Resources" grid. Uncheck "Published" to hide a post without deleting it.</p>
-      <div class="item-list" id="blogList"></div>
-      <hr class="divider">
-      <h3 style="font-size:15px;">Add new post</h3>
-      <div class="row">
-        <div><label>Kicker / category</label><input type="text" id="blogKicker" placeholder="Process"></div>
-        <div><label>Read time</label><input type="text" id="blogReadTime" placeholder="6 min read"></div>
-      </div>
-      <label>Title</label><input type="text" id="blogTitle">
-      <label>URL slug (used for the post's page — leave blank to auto-generate from title)</label>
-      <input type="text" id="blogSlug" placeholder="how-to-brief-a-webflow-designer">
-      <label>Excerpt (short summary shown on the card)</label>
-      <textarea id="blogExcerpt"></textarea>
-      <label>Full post content (supports markdown — headings, **bold**, lists, links, etc.)</label>
-      <textarea id="blogBody" style="min-height:180px;" placeholder="## Start with the goal&#10;&#10;Write your post here in markdown..."></textarea>
-      <div class="row">
-        <div><label>Link URL (only used if you leave the post content blank, to link elsewhere instead)</label><input type="url" id="blogLink" placeholder="https://..."></div>
-        <div><label>Sort order</label><input type="number" id="blogSort" value="0"></div>
-      </div>
-      <label><input type="checkbox" id="blogPublished" checked> Published</label>
-      <div class="actions">
-        <button class="btn-primary" id="addBlogBtn">Add post</button>
-        <span class="status" id="blogStatus"></span>
+    <!-- 3. BLOG POSTS SCREEN -->
+    <div id="blogScreen" class="screen-pane">
+      <div class="card">
+        <h2>Blog posts</h2>
+        <p class="hint">Shown in the "Resources" grid. Uncheck "Published" to hide a post without deleting it.</p>
+        <div class="item-list" id="blogList"></div>
+        <hr class="divider">
+        
+        <h3 id="blogFormTitle" style="font-size:15px;">Add new post</h3>
+        <input type="hidden" id="blogId" value="">
+        <div class="row">
+          <div><label>Kicker / category</label><input type="text" id="blogKicker" placeholder="Process"></div>
+          <div><label>Read time</label><input type="text" id="blogReadTime" placeholder="6 min read"></div>
+        </div>
+        <label>Title</label><input type="text" id="blogTitle">
+        
+        <label>Description / Content (Rich Text)</label>
+        <div class="rte-container">
+          <div class="rte-toolbar" data-editor="blogExcerpt">
+            <button type="button" class="rte-tool" data-cmd="bold"><b>B</b></button>
+            <button type="button" class="rte-tool" data-cmd="italic"><i>I</i></button>
+            <button type="button" class="rte-tool" data-cmd="createLink">Link</button>
+            <button type="button" class="rte-tool" data-cmd="insertImage">Img URL</button>
+            <button type="button" class="rte-tool" data-cmd="insertVideo">Video Embed</button>
+            <button type="button" class="rte-tool" data-cmd="insertHTML">Raw HTML</button>
+          </div>
+          <div id="blogExcerpt" class="rte-editor" contenteditable="true"></div>
+        </div>
+
+        <div class="row">
+          <div><label>Link URL</label><input type="url" id="blogLink" placeholder="https://..."></div>
+          <div><label>Sort order</label><input type="number" id="blogSort" value="0"></div>
+        </div>
+        <label><input type="checkbox" id="blogPublished" checked> Published</label>
+        <div class="actions">
+          <button class="btn-primary" id="addBlogBtn">Add post</button>
+          <button class="btn-outline" id="cancelBlogEditBtn" style="display:none;">Cancel Edit</button>
+          <span class="status" id="blogStatus"></span>
+        </div>
       </div>
     </div>
 
