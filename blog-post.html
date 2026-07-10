@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title id="pageTitle">Blog — Ibrahim Babalola</title>
+<meta name="description" id="pageDescription" content="">
+<link id="favicon" rel="icon" type="image/png" href="https://placehold.co/64x64/EFF9FD/152229?text=IB">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,500;0,600;1,500&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="theme.css">
+</head>
+<body>
+
+<a href="#main" class="skip-link">Skip to content</a>
+
+<header class="site">
+  <div class="wrap nav-row">
+    <a href="index.html" class="logo"><img id="siteLogoImg" class="logo-img" alt="Site logo"><span class="logo-text"><span class="name" id="siteLogoName">Ibrahim Babalola</span><span class="sub">Kokotide Studio · Webflow</span></span></a>
+    <nav class="primary" aria-label="Primary">
+      <ul>
+        <li><a href="index.html#work">Work</a></li>
+        <li><a href="index.html#services">Services</a></li>
+        <li><a href="index.html#about">About</a></li>
+        <li><a href="index.html#resources">Resources</a></li>
+        <li><a href="index.html#contact">Contact</a></li>
+      </ul>
+    </nav>
+    <div class="header-cta">
+      <a href="index.html#work" class="btn btn-outline">See my work</a>
+      <a href="index.html#contact" class="btn btn-accent" data-book-call>Book a call</a>
+    </div>
+  </div>
+</header>
+
+<main id="main">
+
+  <div id="postContent"></div>
+
+  <div class="not-found" id="notFound" style="display:none;">
+    <h1>Post not found</h1>
+    <p>This post may have been unpublished or the link is out of date.</p>
+    <a href="index.html#resources" class="btn btn-accent">Back to resources</a>
+  </div>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="footer-row">
+      <div>
+        <a href="index.html" class="logo"><img id="siteLogoImgFooter" class="logo-img" alt="Site logo"><span class="logo-text"><span class="name" id="siteLogoNameFooter">Ibrahim Babalola</span></span></a>
+        <p style="margin-top:10px; font-size:13.5px; max-width:280px;">Webflow designer &amp; developer for startups and SaaS teams. Based remote, working worldwide.</p>
+      </div>
+      <nav class="foot-nav" aria-label="Footer">
+        <a href="index.html#work">Work</a>
+        <a href="index.html#services">Services</a>
+        <a href="index.html#about">About</a>
+        <a href="index.html#resources">Resources</a>
+        <a href="index.html#contact">Contact</a>
+      </nav>
+      <div class="social-row">
+        <a href="#">X / Twitter</a>
+        <a href="#">LinkedIn</a>
+        <a href="#">Instagram</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Ibrahim Babalola. All rights reserved.</span>
+      <span>hello@ibrahimbabalola.com</span>
+    </div>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="config.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+  loadSiteSettingsForDetailPage(); // logo/favicon/book-call — shared logic below
+
+  const slug = new URLSearchParams(location.search).get('slug');
+  const contentEl = document.getElementById('postContent');
+  const notFoundEl = document.getElementById('notFound');
+
+  if (!slug) { contentEl.style.display = 'none'; notFoundEl.style.display = 'block'; return; }
+
+  try {
+    const { data, error } = await supabaseClient
+      .from('blog_posts')
+      .select('*')
+      .eq('slug', slug)
+      .eq('published', true)
+      .maybeSingle();
+
+    if (error || !data) { contentEl.style.display = 'none'; notFoundEl.style.display = 'block'; return; }
+
+    document.getElementById('pageTitle').textContent = data.title + ' — Ibrahim Babalola';
+    document.getElementById('pageDescription').content = data.excerpt || '';
+
+    const bodyHtml = data.body ? marked.parse(data.body) : '<p>' + escapeHtml(data.excerpt || '') + '</p>';
+
+    contentEl.innerHTML = `
+      <section class="article-head">
+        <div class="wrap">
+          <a class="back-link" href="index.html#resources">&larr; Back to resources</a>
+          <div class="eyebrow">${escapeHtml(data.kicker || 'Blog')}</div>
+          <h1>${escapeHtml(data.title)}</h1>
+          <div class="meta-row">
+            ${data.read_time ? `<span>${escapeHtml(data.read_time)}</span>` : ''}
+          </div>
+        </div>
+      </section>
+      <article class="prose wrap">${bodyHtml}</article>
+    `;
+  } catch (err) {
+    console.error(err);
+    contentEl.style.display = 'none'; notFoundEl.style.display = 'block';
+  }
+});
+
+async function loadSiteSettingsForDetailPage() {
+  try {
+    const { data } = await supabaseClient.from('site_settings').select('logo_url, favicon_url, book_call_url').eq('id', 1).maybeSingle();
+    if (!data) return;
+    if (data.logo_url) {
+      ['siteLogoImg','siteLogoImgFooter'].forEach(id => { const el = document.getElementById(id); if (el) { el.src = data.logo_url; el.style.display = 'block'; } });
+      ['siteLogoName','siteLogoNameFooter'].forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; });
+    }
+    if (data.favicon_url) { const f = document.getElementById('favicon'); if (f) f.href = data.favicon_url; }
+    if (data.book_call_url) { document.querySelectorAll('[data-book-call]').forEach(a => a.href = data.book_call_url); }
+  } catch (err) { console.error(err); }
+}
+
+function escapeHtml(str) {
+  return String(str ?? '').replace(/[&<>"']/g, s => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[s]));
+}
+</script>
+</body>
+</html>
