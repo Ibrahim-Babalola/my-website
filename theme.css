@@ -20,7 +20,7 @@
   --danger:#d9534f;      /* used for destructive actions in admin.html */
 
   /* ---- Fonts: change these to re-type the whole site ---- */
-  --display:'Poppins', serif;         /* headings */
+  --display:'Fraunces', serif;         /* headings */
   --body:'Inter', sans-serif;          /* body copy, UI */
   --mono:'JetBrains Mono', monospace;  /* labels, eyebrows, meta */
 
